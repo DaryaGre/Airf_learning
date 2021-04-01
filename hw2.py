@@ -72,5 +72,10 @@ with DAG(
         python_callable=mean_fare_per_class,
         dag=dag,
     )
+    last_task = BashOperator(
+        task_id='last_task',
+        bash_command='echo "Pipeline finished! Execution date is {{ ds }}"',
+        dag=dag,
+    )
     # Порядок выполнения тасок
-    first_task >> create_titanic_dataset >> pivot_titanic_dataset>>mean_fares_titanic_dataset
+    first_task >> create_titanic_dataset >> [pivot_titanic_dataset, mean_fares_titanic_dataset]>>last_task
