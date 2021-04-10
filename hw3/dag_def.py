@@ -24,11 +24,12 @@ def pivot_dataset(**context):
                                 columns=['Pclass'],
                                 values='Name',
                                 aggfunc='count').reset_index()
-    #hook = BaseHook.get_hook('airflow')
 
-    #hook.insert_rows('t1', df, ['col1', 'col2'], 5, False) так не работает... (в других вариантах тоже), время на эксперименты кончилось...
+    df = df.to_json()
 
-    df.to_csv(get_path('titanic_pivot.csv'))
+    context['task_instance'].xcom_push('pivot_dataset_xcom_key', df)
+
+
 
 @python_operator()
 def mean_fare_per_class(**context):
@@ -37,9 +38,9 @@ def mean_fare_per_class(**context):
     df = titanic_df.groupby(['Pclass']).agg({'Fare':"mean"}
     ).reset_index()
 
-    #hook = BaseHook.get_hook('airflow')
+    df = df.to_json()
 
-    #hook.insert_rows('test1', df) так не работает... (в других вариантах тоже), время на эксперименты кончилось...
+    context['task_instance'].xcom_push('mean_fare_per_class_xcom_key', df)
 
-    df.to_csv(get_path('titanic_mean_fares.csv'))
+
 
